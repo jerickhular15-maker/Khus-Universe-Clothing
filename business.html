@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KHUS UNIVERSE Clothing Shop</title>
+  <style>
+    body {font-family: Arial, sans-serif; background:#0a0a1a; color:#fff; margin:0;}
+    header {background:#1a1a3a; padding:20px; text-align:center; font-size:2em; font-weight:bold;}
+    .shop-section {display:flex; flex-wrap:wrap; justify-content:center; padding:20px;}
+    .product {background:#1a1a3a; margin:15px; padding:15px; border-radius:10px; width:280px; text-align:center;}
+    .product img {width:100%; border-radius:10px;}
+    select, input {padding:8px; margin:5px 0; width:90%;}
+    button {background:#ff007f; color:#fff; border:none; padding:10px 20px; border-radius:5px; cursor:pointer;}
+    .cart, .order-form, .orders {background:#141428; padding:20px; margin:20px; border-radius:10px;}
+    .orders h2 {color:#00bfff;}
+  </style>
+</head>
+<body>
+  <header>KHUS UNIVERSE</header>
+
+  <section class="shop-section">
+    <div class="product">
+      <img src="black.png" alt="Black T">
+      <h2>Black KhusT</h2>
+      <p>₱500.00</p>
+      <label>Size:</label>
+      <select id="size1"><option>S</option><option>M</option><option>L</option></select>
+      <button onclick="addToCart('Black T', 500, document.getElementById('size1').value)">Add to Cart</button>
+    </div>
+
+    <div class="product">
+      <img src="white.png" alt="White T">
+      <h2>White KhusT</h2>
+      <p>₱500.00</p>
+      <label>Size:</label>
+      <select id="size2"><option>S</option><option>M</option><option>L</option></select>
+      <button onclick="addToCart('White T', 500, document.getElementById('size2').value)">Add to Cart</button>
+    </div>
+  </section>
+
+  <section class="cart">
+    <h2>Cart</h2>
+    <ul id="cartItems"></ul>
+    <p id="total">Total: ₱0</p>
+    <p>+ Shipping Fee: ₱75</p>
+  </section>
+
+  <section class="order-form">
+    <h2>Customer Info</h2>
+    <input type="text" id="name" placeholder="Full Name" required>
+    <input type="text" id="address" placeholder="Complete Address" required>
+    <input type="text" id="contact" placeholder="Contact Number" required>
+    <button onclick="placeOrder()">Place Order</button>
+  </section>
+
+  <section class="orders">
+    <h2>Orders Log (Admin View)</h2>
+    <div id="ordersList"></div>
+  </section>
+
+  <script>
+    let cart = [];
+    let orders = [];
+
+    function addToCart(product, price, size) {
+      cart.push({product, price, size});
+      renderCart();
+    }
+
+    function renderCart() {
+      let list = document.getElementById('cartItems');
+      list.innerHTML = '';
+      let total = 0;
+      cart.forEach(item => {
+        let li = document.createElement('li');
+        li.textContent = `${item.product} - Size: ${item.size} - ₱${item.price}`;
+        list.appendChild(li);
+        total += item.price;
+      });
+      document.getElementById('total').textContent = 'Total: ₱' + (total + 75);
+    }
+
+    function placeOrder() {
+      let name = document.getElementById('name').value.trim();
+      let address = document.getElementById('address').value.trim();
+      let contact = document.getElementById('contact').value.trim();
+      if(!name || !address || !contact || cart.length===0){
+        alert("Complete all info and add items to cart!");
+        return;
+      }
+      let total = cart.reduce((sum, i)=>sum+i.price,0)+75;
+      let orderDetails = {
+        name, address, contact,
+        items: [...cart],
+        total
+      };
+      orders.push(orderDetails);
+      renderOrders();
+      cart = [];
+      renderCart();
+      alert("Order placed successfully!");
+    }
+
+    function renderOrders() {
+      let container = document.getElementById('ordersList');
+      container.innerHTML = '';
+      orders.forEach((order, index) => {
+        let div = document.createElement('div');
+        div.style.borderBottom = "1px solid #333";
+        div.style.marginBottom = "10px";
+        div.innerHTML = `<strong>Order #${index+1}</strong><br>
+          Name: ${order.name}<br>
+          Address: ${order.address}<br>
+          Contact: ${order.contact}<br>
+          Items:<br>` +
+          order.items.map(i=>`- ${i.product} (Size: ${i.size}) ₱${i.price}`).join("<br>") +
+          `<br>Total: ₱${order.total}`;
+        container.appendChild(div);
+      });
+    }
+  </script>
+
+  <footer style="text-align:center; padding:20px; background:#111;">
+    © 2026 KHUS UNIVERSE | Shipping via J&T Only
+  </footer>
+</body>
+</html>
